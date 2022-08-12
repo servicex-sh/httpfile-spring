@@ -159,6 +159,15 @@ public class HttpFileRequest {
         return defaultValue;
     }
 
+    public static String base64UserAndPassword(String headValue) {
+        String token = headValue.substring(6).trim();
+        if (token.contains(" ") || token.contains(":")) {
+            String text = token.replace(" ", ":");
+            return "Basic " + Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
+        }
+        return headValue;
+    }
+
     public void addHttpHeader(String name, String value) {
         if (headers == null) {
             headers = new ArrayList<>();
@@ -166,11 +175,7 @@ public class HttpFileRequest {
         if (name.equalsIgnoreCase("authorization")) {
             // Convert `username password` or `username:password` to Base64
             if (value.startsWith("Basic ")) {
-                String token = value.substring(6).trim();
-                if (token.contains(" ") || token.contains(":")) {
-                    String text = token.replace(" ", ":");
-                    value = "Basic " + Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
-                }
+                value = base64UserAndPassword(value);
             }
         } else if (name.equalsIgnoreCase("host") || name.equalsIgnoreCase("uri")) {
             HttpRequestTarget requestTarget = getRequestTarget();
@@ -328,31 +333,10 @@ public class HttpFileRequest {
         }
     }
 
-    @Nullable
-    public String[] getBasicAuthorization() {
-        final String header = this.getHeader("Authorization");
-        if (header != null && header.startsWith("Basic ")) {
-            final String base64Text = header.substring(6).trim();
-            return new String(Base64.getDecoder().decode(base64Text), StandardCharsets.UTF_8).split("[:\s]");
-        }
-        return null;
-    }
-
     public boolean isFilled() {
         return method != null && requestLine != null;
     }
 
-    public boolean isHostOrUriAvailable() {
-        if (headers != null && !headers.isEmpty()) {
-            for (HttpHeader header : headers) {
-                final String headerName = header.getName();
-                if (headerName.equalsIgnoreCase("Host") || headerName.equalsIgnoreCase("URI")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     public boolean isBodyEmpty() {
         return bodyLines == null || bodyLines.isEmpty();
