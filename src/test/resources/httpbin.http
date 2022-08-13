@@ -18,3 +18,7 @@ GRAPHQL https://httpbin.org/post
 query {
   hello
 }
+
+{
+  "hello": "abc"
+}
