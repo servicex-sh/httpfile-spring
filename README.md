@@ -58,22 +58,24 @@ You can call GraphQL over HTTP services in http file, and request as following:
 ```
 ### graphql test
 //@name graphqlTest
-GRAPHQL http://localhost:8080/graphql
+GRAPHQL https://localhost:8787/graphql
 
-query demo($bookId: ID){
-    bookById(id: $bookId) {
-        id
-        name
-        pageCount
-        author {
-            firstName
-            lastName
-        }
-    }
+query {
+   welcome(name : "{{nick}}" )
 }
+```
+ 
+Then create method API and GraphqlResponse record: 
 
-{
-  "bookId": "book-1"
+```java
+@HttpFile("httpbin.http")
+public interface HttpBinService {
+  
+    @HttpRequestName("graphqlTest")
+    GraphqlResponse graphqlTest(String nick);
+
+    record GraphqlResponse(Map<String, Object> data, Map<String, Object> extensions, List<Object> errors) {
+    }
 }
 ```
 
