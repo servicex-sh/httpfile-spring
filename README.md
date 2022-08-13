@@ -51,6 +51,34 @@ public interface HttpBinService {
  String ip = httpBinService.myIp().origin();
 ```
 
+# GraphQL over HTTP support
+
+You can call GraphQL over HTTP services in http file, and request as following:
+
+```
+### graphql test
+//@name graphqlTest
+GRAPHQL http://localhost:8080/graphql
+
+query demo($bookId: ID){
+    bookById(id: $bookId) {
+        id
+        name
+        pageCount
+        author {
+            firstName
+            lastName
+        }
+    }
+}
+
+{
+  "bookId": "book-1"
+}
+```
+
+And 
+
 # References
 
 * Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-M5/reference/html/integration.html#rest-http-interface
