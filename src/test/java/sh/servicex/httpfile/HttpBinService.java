@@ -10,10 +10,10 @@ public interface HttpBinService {
     @HttpRequestName("postTest")
     PostResponse post(String nick);
 
-    public record MyIp(String origin) {
+    record MyIp(String origin) {
     }
 
-    public record PostResponse(String url, Map<String, String> headers, String data) {
+    record PostResponse(String url, Map<String, String> headers, String data) {
     }
 }
 
