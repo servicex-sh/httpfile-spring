@@ -20,7 +20,7 @@ public interface HttpBinService {
     record PostResponse(String url, Map<String, String> headers, String data) {
     }
 
-    record GraphqlResponse(Map<String, Object> data, Map<String, Object> extensions, List<Object> errors) {
+    record GraphqlResponse(Map<String, Object> data, Map<String, Object> extensions, List<Map<String,Object>> errors) {
     }
 }
 
