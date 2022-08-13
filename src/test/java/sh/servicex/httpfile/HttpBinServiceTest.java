@@ -27,7 +27,12 @@ public class HttpBinServiceTest {
 
     @Test
     public void testHttpPostDemo() throws Exception {
-        System.out.println(httpBinService.post("linux_china").data());
+        System.out.println(httpBinService.postTest("linux_china").data());
+    }
+
+    @Test
+    public void testGraphqlDemo() throws Exception {
+        System.out.println(httpBinService.graphqlTest("linux_china").data());
     }
 
     @Test
