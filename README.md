@@ -77,8 +77,6 @@ query demo($bookId: ID){
 }
 ```
 
-And 
-
 # References
 
 * Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-M5/reference/html/integration.html#rest-http-interface
