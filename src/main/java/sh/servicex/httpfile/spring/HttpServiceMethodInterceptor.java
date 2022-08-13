@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class HttpRequestMethodInterceptor implements MethodInterceptor {
+public class HttpServiceMethodInterceptor implements MethodInterceptor {
     private final Map<Method, HttpRequestStub> httpServiceMethods;
 
-    public HttpRequestMethodInterceptor(List<HttpRequestStub> methods) {
+    public HttpServiceMethodInterceptor(List<HttpRequestStub> methods) {
         this.httpServiceMethods = methods.stream()
                 .collect(Collectors.toMap(HttpRequestStub::getMethod, Function.identity()));
     }
