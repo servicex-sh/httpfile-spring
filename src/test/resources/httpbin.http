@@ -1,0 +1,20 @@
+### get my ip
+//@name myIp
+GET https://httpbin.org/ip
+
+### Post test
+//@name postTest
+POST https://httpbin.org/post
+Content-Type: application/json
+
+{
+  "hello": "{{nick}}"
+}
+
+### graphql test
+//@name graphqlTest
+GRAPHQL https://httpbin.org/post
+
+query {
+  hello
+}
