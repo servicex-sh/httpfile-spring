@@ -15,10 +15,10 @@ public interface HttpBinClient {
     @PostExchange("/post")
     PostResponse post(@RequestBody String body);
 
-    public record MyIp(String origin) {
+    record MyIp(String origin) {
     }
 
-    public record PostResponse(String url, Map<String, String> headers, String data) {
+    record PostResponse(String url, Map<String, String> headers, String data) {
     }
 }
 
