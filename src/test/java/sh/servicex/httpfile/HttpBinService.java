@@ -8,7 +8,10 @@ public interface HttpBinService {
     MyIp myIp();
 
     @HttpRequestName("postTest")
-    PostResponse post(String nick);
+    PostResponse postTest(String nick);
+
+    @HttpRequestName("graphqlTest")
+    PostResponse graphqlTest(String nick);
 
     record MyIp(String origin) {
     }
