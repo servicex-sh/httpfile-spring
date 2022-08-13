@@ -21,10 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Function;
 
 public class HttpRequestStub {
@@ -56,7 +53,11 @@ public class HttpRequestStub {
         } else {
             this.uri = URI.create(uriText);
         }
-        this.httpMethod = HttpMethod.valueOf(httpFileRequest.getMethod().getName());
+        String methodName = httpFileRequest.getMethod().getName();
+        if (httpFileRequest.getMethod().isGraphQLMethod()) {
+            methodName = "POST";
+        }
+        this.httpMethod = HttpMethod.valueOf(methodName);
         this.httpFileRequest = httpFileRequest;
         this.body = httpFileRequest.getBody();
         this.variablesInBody = httpFileRequest.isVariablesInBody();
@@ -94,11 +95,34 @@ public class HttpRequestStub {
         fillHeaders(requestValues, variableValueResolver);
         // set request body
         if (body != null) {
+            String bodyText = body;
             if (this.variablesInBody) {
-                requestValues.setBodyValue(variableValueResolver.resolveStringValue(this.body));
-            } else {
-                requestValues.setBodyValue(body);
+                bodyText = variableValueResolver.resolveStringValue(this.body);
             }
+            //GRAPHQL method process
+            if (httpFileRequest.getMethod().isGraphQLMethod()) {
+                try {
+                    Map<String, Object> jsonBody = new HashMap<>();
+                    jsonBody.put("query", bodyText);
+                    // check body + variables json
+                    int offset1 = bodyText.lastIndexOf('{');
+                    int offset2 = bodyText.lastIndexOf('}');
+                    if (offset2 > offset1) {
+                        String jsonText = bodyText.substring(offset1, offset2 + 1);
+                        if (jsonText.contains("\"")) {
+                            try {
+                                jsonBody.put("variables", JsonUtils.readValue(jsonText, Map.class));
+                                jsonBody.put("query", bodyText.subSequence(0, offset1));
+                            } catch (Exception ignore) {
+                            }
+                        }
+                    }
+                    bodyText = JsonUtils.writeValueAsString(jsonBody);
+                    requestValues.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+                } catch (Exception ignore) {
+                }
+            }
+            requestValues.setBodyValue(bodyText);
         }
         return this.responseFunction.execute(requestValues.build());
     }
