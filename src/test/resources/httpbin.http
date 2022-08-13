@@ -13,12 +13,8 @@ Content-Type: application/json
 
 ### graphql test
 //@name graphqlTest
-GRAPHQL https://httpbin.org/post
+GRAPHQL https://localhost:8787/graphql
 
 query {
-  hello
-}
-
-{
-  "hello": "abc"
+   welcome(name : "{{nick}}" )
 }
