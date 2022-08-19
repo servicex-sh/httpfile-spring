@@ -15,6 +15,11 @@ Content-Type: application/json
 //@name graphqlTest
 GRAPHQL https://localhost:8787/graphql
 
-query {
-   welcome(name : "{{nick}}" )
+query demo($nick: String!) {
+   welcome(name : $nick )
 }
+
+{
+  "nick": "{{nick}}"
+}
+
