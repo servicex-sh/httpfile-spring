@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.service.invoker.HttpClientAdapter;
 import org.springframework.web.service.invoker.HttpRequestValues;
 import reactor.core.publisher.Flux;
@@ -21,7 +22,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.time.Duration;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Function;
 
 public class HttpRequestStub {
@@ -102,22 +106,32 @@ public class HttpRequestStub {
             //GRAPHQL method process
             if (httpFileRequest.getMethod().isGraphQLMethod()) {
                 try {
-                    Map<String, Object> jsonBody = new HashMap<>();
-                    jsonBody.put("query", bodyText);
-                    // check body + variables json
+                    StringBuilder builder = new StringBuilder();
+                    boolean variablesIncluded = false;
+                    builder.append("{\"query\":\"");
                     int offset1 = bodyText.lastIndexOf('{');
                     int offset2 = bodyText.lastIndexOf('}');
                     if (offset2 > offset1) {
                         String jsonText = bodyText.substring(offset1, offset2 + 1);
                         if (jsonText.contains("\"")) {
                             try {
-                                jsonBody.put("variables", JsonUtils.readValue(jsonText, Map.class));
-                                jsonBody.put("query", bodyText.subSequence(0, offset1));
+                                variablesIncluded = true;
+                                String query = bodyText.substring(0, offset1);
+                                query = StringUtils.replace(query, "\"", "\\\"");
+                                query = StringUtils.replace(query, "\n", "\\n");
+                                builder.append(query);
+                                builder.append("\",\"variables\":");
+                                builder.append(jsonText);
+                                builder.append("}");
                             } catch (Exception ignore) {
                             }
                         }
                     }
-                    bodyText = JsonUtils.writeValueAsString(jsonBody);
+                    if (!variablesIncluded) {
+                        builder.append(bodyText);
+                        builder.append("\"}");
+                    }
+                    bodyText = builder.toString();
                     requestValues.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
                 } catch (Exception ignore) {
                 }
