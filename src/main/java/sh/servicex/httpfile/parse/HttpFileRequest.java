@@ -356,21 +356,48 @@ public class HttpFileRequest {
                         }
                     }
                     if (!lines.isEmpty()) {
-                        String content = String.join(System.lineSeparator(), lines);
-                        String contentType = getHeader("Content-Type");
-                        // Fix https://youtrack.jetbrains.com/issue/IDEA-281753/Support-formatting-for-POST-request-body-for-application-x-www-f
-                        if (contentType != null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded") && content.contains("\n")) {
-                            content = StringUtils.replace(content, "\n", "");
-                            content = StringUtils.replace(content, "\r", "");
+                        if (method.isGraphQLMethod()) {  // convert GraphQL to JSON
+                            final int json_offset = lines.lastIndexOf("{");
+                            String lastLine = lines.get(lines.size() - 1);
+                            StringBuilder builder = new StringBuilder();
+                            boolean variablesIncluded = false;
+                            builder.append("{\"query\":\"");
+                            if (json_offset > 0 && lastLine.endsWith("}")) {
+                                variablesIncluded = true;
+                                String query = String.join("\n", lines.subList(0, json_offset));
+                                String jsonText = String.join("\n", lines.subList(json_offset, lines.size()));
+                                query = StringUtils.replace(query, "\"", "\\\"");
+                                query = StringUtils.replace(query, "\n", "\\n");
+                                builder.append(query);
+                                builder.append("\",\"variables\":");
+                                builder.append(jsonText);
+                                builder.append("}");
+                            }
+                            if (!variablesIncluded) {
+                                String bodyText = String.join("\n", lines);
+                                bodyText = StringUtils.replace(bodyText, "\"", "\\\"");
+                                bodyText = StringUtils.replace(bodyText, "\n", "\\n");
+                                builder.append(bodyText);
+                                builder.append("\"}");
+                            }
+                            this.body = builder.toString();
+                        } else {
+                            String content = String.join(System.lineSeparator(), lines);
+                            String contentType = getHeader("Content-Type");
+                            // Fix https://youtrack.jetbrains.com/issue/IDEA-281753/Support-formatting-for-POST-request-body-for-application-x-www-f
+                            if (contentType != null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded") && content.contains("\n")) {
+                                content = StringUtils.replace(content, "\n", "");
+                                content = StringUtils.replace(content, "\r", "");
+                            }
+                            this.body = content;
                         }
-                        this.body = content;
                     }
                 }
             }
-            if (body != null && this.body.contains("{{")) {
-                this.variablesInBody = true;
-            }
+        }
+        if (body != null && this.body.contains("{{")) {
+            this.variablesInBody = true;
         }
     }
-
 }
+
