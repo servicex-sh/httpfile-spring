@@ -363,15 +363,18 @@ public class HttpFileRequest {
                             boolean variablesIncluded = false;
                             builder.append("{\"query\":\"");
                             if (json_offset > 0 && lastLine.endsWith("}")) {
-                                variablesIncluded = true;
+
                                 String query = String.join("\n", lines.subList(0, json_offset));
                                 String jsonText = String.join("\n", lines.subList(json_offset, lines.size()));
-                                query = StringUtils.replace(query, "\"", "\\\"");
-                                query = StringUtils.replace(query, "\n", "\\n");
-                                builder.append(query);
-                                builder.append("\",\"variables\":");
-                                builder.append(jsonText);
-                                builder.append("}");
+                                if (jsonText.contains("\"")) {
+                                    variablesIncluded = true;
+                                    query = StringUtils.replace(query, "\"", "\\\"");
+                                    query = StringUtils.replace(query, "\n", "\\n");
+                                    builder.append(query);
+                                    builder.append("\",\"variables\":");
+                                    builder.append(jsonText);
+                                    builder.append("}");
+                                }
                             }
                             if (!variablesIncluded) {
                                 String bodyText = String.join("\n", lines);
