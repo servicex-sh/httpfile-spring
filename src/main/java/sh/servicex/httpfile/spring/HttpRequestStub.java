@@ -10,7 +10,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.service.invoker.HttpClientAdapter;
 import org.springframework.web.service.invoker.HttpRequestValues;
 import reactor.core.publisher.Flux;
@@ -32,7 +31,7 @@ public class HttpRequestStub {
     private final Method method;
     private final Class<?> containingClass;
     private final HttpClientAdapter clientAdapter;
-    private final HttpMethod httpMethod;
+    private HttpMethod httpMethod;
     @Nullable
     private URI uri;
     @Nullable
@@ -71,7 +70,6 @@ public class HttpRequestStub {
         return method;
     }
 
-
     @Nullable
     public Object invoke(Object[] arguments) {
         Properties properties = new Properties();
@@ -98,45 +96,12 @@ public class HttpRequestStub {
         // set http headers
         fillHeaders(requestValues, variableValueResolver);
         // set request body
-        if (body != null) {
-            String bodyText = body;
+        if (this.body != null) {
             if (this.variablesInBody) {
-                bodyText = variableValueResolver.resolveStringValue(this.body);
+                requestValues.setBodyValue(variableValueResolver.resolveStringValue(this.body));
+            } else {
+                requestValues.setBodyValue(this.body);
             }
-            //GRAPHQL method process
-            if (httpFileRequest.getMethod().isGraphQLMethod()) {
-                try {
-                    StringBuilder builder = new StringBuilder();
-                    boolean variablesIncluded = false;
-                    builder.append("{\"query\":\"");
-                    int offset1 = bodyText.lastIndexOf('{');
-                    int offset2 = bodyText.lastIndexOf('}');
-                    if (offset2 > offset1) {
-                        String jsonText = bodyText.substring(offset1, offset2 + 1);
-                        if (jsonText.contains("\"")) {
-                            try {
-                                variablesIncluded = true;
-                                String query = bodyText.substring(0, offset1);
-                                query = StringUtils.replace(query, "\"", "\\\"");
-                                query = StringUtils.replace(query, "\n", "\\n");
-                                builder.append(query);
-                                builder.append("\",\"variables\":");
-                                builder.append(jsonText);
-                                builder.append("}");
-                            } catch (Exception ignore) {
-                            }
-                        }
-                    }
-                    if (!variablesIncluded) {
-                        builder.append(bodyText);
-                        builder.append("\"}");
-                    }
-                    bodyText = builder.toString();
-                    requestValues.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-                } catch (Exception ignore) {
-                }
-            }
-            requestValues.setBodyValue(bodyText);
         }
         return this.responseFunction.execute(requestValues.build());
     }
@@ -159,6 +124,9 @@ public class HttpRequestStub {
                     requestValues.addHeader(name, header.getValue());
                 }
             }
+        }
+        if (httpFileRequest.getMethod().isGraphQLMethod()) {
+            requestValues.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         }
     }
 
