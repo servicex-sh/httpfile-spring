@@ -13,13 +13,17 @@ Content-Type: application/json
 
 ### graphql test
 //@name graphqlTest
-GRAPHQL https://localhost:8787/graphql
+GRAPHQL https://graphqlzero.almansi.me/api
 
-query demo($nick: String!) {
-   welcome(name : $nick )
+query demo($id: ID!) {
+   post(id: $id) {
+       id
+       title
+       body
+     }
 }
 
 {
-  "nick": "{{nick}}"
+  "id": 1
 }
 
