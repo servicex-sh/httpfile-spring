@@ -11,8 +11,7 @@ import java.util.List;
  * @author linux_china
  */
 public class HttpFileParser {
-
-    public static List<HttpFileRequest> parse(String httpFileCode) {
+    public static List<HttpFileRequest> splitRequests(String httpFileCode) {
         List<HttpFileRequest> requests = new ArrayList<>();
         try {
             final BufferedReader bufferedReader = new BufferedReader(new StringReader(httpFileCode));
@@ -40,7 +39,7 @@ public class HttpFileParser {
                         httpRequest = new HttpFileRequest(index);
                         httpRequest.setComment(comment);
                     }
-                } else if (!httpRequest.isBodyStarted()) {
+                } else if (!httpRequest.isRequestStarted()) {
                     if ((line.startsWith("#") || line.startsWith("//"))) { //comment
                         String comment = (line.startsWith("#") ? line.substring(1) : line.substring(2)).trim();
                         if (comment.startsWith("@")) { // tag for httpRequest
@@ -50,17 +49,54 @@ public class HttpFileParser {
                                 httpRequest.setName(parts[1].trim());
                             }
                             httpRequest.addTag(tag);
-                        } else {   // normal comment
-                            if (httpRequest.getComment() == null) {
-                                httpRequest.setComment(comment);
-                            }
                         }
-                    } else if (HttpMethod.isRequestLine(line)) {  // request line parse
+                    } else if (HttpMethod.isRequestLine(line)) {   // normal comment
                         int position = line.indexOf(' ');
                         final String method = line.substring(0, position);
                         httpRequest.setMethod(HttpMethod.valueOf(method));
                         httpRequest.setRequestLine(line.substring(position + 1));
-                    } else if ((rawLine.startsWith("  ") || rawLine.startsWith("\t"))) { // append request line parts in multi lines
+                        httpRequest.addRequestLine(rawLine);
+                    } else {
+                        httpRequest.addPreScriptLine(line);
+                    }
+                } else {
+                    httpRequest.addRequestLine(rawLine);
+                }
+                httpRequest.addLineNumber(lineNumber);
+                lineNumber++;
+            }
+            if (httpRequest.isFilled()) {  //add last httpRequest
+                requests.add(httpRequest);
+            }
+        } catch (Exception ignore) {
+        }
+        return requests;
+    }
+
+    public static void parse(HttpFileRequest httpRequest) {
+        try {
+            final BufferedReader bufferedReader = new BufferedReader(new StringReader(httpRequest.getRequestCode()));
+            List<String> lines = bufferedReader.lines().toList();
+            int offset = 0;
+            String requestLine = null;
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i).trim();
+                if (!line.isEmpty() && HttpMethod.isRequestLine(line)) {
+                    requestLine = lines.get(i);
+                    offset = i;
+                }
+            }
+            // reset request line
+            if (requestLine != null) {
+                int position = requestLine.indexOf(' ');
+                final String method = requestLine.substring(0, position);
+                httpRequest.setMethod(HttpMethod.valueOf(method));
+                httpRequest.setRequestLine(requestLine.substring(position + 1));
+            }
+            for (String rawLine : lines.subList(offset + 1, lines.size())) {
+                String line = rawLine.trim();
+                if (!httpRequest.isBodyStarted()) {
+                    if ((rawLine.startsWith("  ") || rawLine.startsWith("\t"))) { // append request line parts in multi lines
                         httpRequest.appendRequestLine(line);
                     } else if (line.indexOf(':') > 0 && !httpRequest.isBodyStarted()) { //http request headers parse: body should be empty
                         int position = line.indexOf(':');
@@ -81,16 +117,17 @@ public class HttpFileParser {
                 } else {  // parse httpRequest body
                     httpRequest.addBodyLine(rawLine);
                 }
-                httpRequest.addLineNumber(lineNumber);
-                lineNumber++;
-            }
-            if (httpRequest.isFilled()) {  //add last httpRequest
-                requests.add(httpRequest);
             }
         } catch (Exception ignore) {
+
         }
+    }
+
+    public static List<HttpFileRequest> parse(String httpFileCode) {
+        final List<HttpFileRequest> requests = splitRequests(httpFileCode);
         for (HttpFileRequest request : requests) {
             try {
+                parse(request);
                 request.cleanBody();
             } catch (Exception ignore) {
             }
