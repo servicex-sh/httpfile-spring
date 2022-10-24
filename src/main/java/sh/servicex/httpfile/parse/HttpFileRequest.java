@@ -19,12 +19,14 @@ public class HttpFileRequest {
     private List<HttpHeader> headers;
     private boolean bodyStarted = false;
     private List<String> bodyLines;
+    private final List<String> requestLines = new ArrayList<>();
     private final List<Integer> lineNumbers = new ArrayList<>();
     private String body;
     private boolean variablesInBody = false;
     private String jsTestCode;
     private String redirectResponse;
     private HttpRequestTarget requestTarget;
+    private List<String> preScriptLines;
 
     public HttpFileRequest() {
     }
@@ -105,6 +107,25 @@ public class HttpFileRequest {
         } else {
             requestLine = requestLine + requestPart.trim();
         }
+    }
+
+    public boolean isRequestStarted() {
+        return requestLine != null;
+    }
+
+    public void addPreScriptLine(String line) {
+        if (this.preScriptLines == null) {
+            preScriptLines = new ArrayList<>();
+        }
+        this.preScriptLines.add(line);
+    }
+
+    public void addRequestLine(String line) {
+        requestLines.add(line);
+    }
+
+    public String getRequestCode() {
+        return String.join("\n", requestLines);
     }
 
     public HttpRequestTarget getRequestTarget() {
