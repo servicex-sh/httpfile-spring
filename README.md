@@ -64,13 +64,14 @@ query {
    welcome(name : "{{nick}}" )
 }
 ```
- 
-Then create method API and GraphqlResponse record: 
+
+Then create method API and GraphqlResponse record:
 
 ```java
+
 @HttpFile("httpbin.http")
 public interface HttpBinService {
-  
+
     @HttpRequestName("graphqlTest")
     GraphqlResponse graphqlTest(String nick);
 
@@ -78,6 +79,11 @@ public interface HttpBinService {
     }
 }
 ```
+
+# Global variables support
+
+* `$uuid`, `$timestamp` and `$randomInt`
+* `$random` object: `$random.integer`, `$random.float`, `$random.alphabetic`, `$random.alphanumeric`, `$random.hexadecimal` and `$random.email`
 
 # References
 
