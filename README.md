@@ -87,5 +87,5 @@ public interface HttpBinService {
 
 # References
 
-* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-M5/reference/html/integration.html#rest-http-interface
+* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-RC2/reference/html/integration.html#rest-http-interface
   
