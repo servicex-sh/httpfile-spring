@@ -5,7 +5,17 @@ Use Java interface and http file to access remote HTTP/GraphQL services.
 
 # How to get started?
 
-* Create index.http file in resources folder, such as `src/main/resources/httpbin.http`, and code as following:
+* Add `httpfile-spring` dependency in pom.xml
+
+```xml
+<dependency>
+    <groupId>org.mvnsearch</groupId>
+    <artifactId>httpfile-spring</artifactId>
+    <version>1.0.0-RC3</version>
+</dependency>
+```
+
+* Create http file in resources folder, such as `src/main/resources/httpbin.http`, and code as following:
 
 ```
 ### get my ip
@@ -102,5 +112,5 @@ httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalC
 
 # References
 
-* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-RC2/reference/html/integration.html#rest-http-interface
+* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-RC3/reference/html/integration.html#rest-http-interface
   
