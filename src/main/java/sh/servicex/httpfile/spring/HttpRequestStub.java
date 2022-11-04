@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.function.Function;
 
 public class HttpRequestStub {
+    private final Map<String, String> globalContext;
     private final Method method;
     private final Class<?> containingClass;
     private final HttpClientAdapter clientAdapter;
@@ -43,10 +44,11 @@ public class HttpRequestStub {
     private final ResponseFunction responseFunction;
 
 
-    public HttpRequestStub(Method method, Class<?> containingClass, HttpClientAdapter clientAdapter,
+    public HttpRequestStub(Map<String, String> globalContext, Method method, Class<?> containingClass, HttpClientAdapter clientAdapter,
                            ReactiveAdapterRegistry reactiveRegistry, Duration blockTimeout,
                            HttpFileRequest httpFileRequest) {
         this.containingClass = containingClass;
+        this.globalContext = globalContext;
         this.method = method;
         this.clientAdapter = clientAdapter;
         this.responseFunction = ResponseFunction.create(clientAdapter, method, reactiveRegistry, blockTimeout);
@@ -73,6 +75,9 @@ public class HttpRequestStub {
     @Nullable
     public Object invoke(Object[] arguments) {
         Properties properties = new Properties();
+        if (!globalContext.isEmpty()) {
+            properties.putAll(globalContext);
+        }
         final Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             String name = parameters[i].getName();
