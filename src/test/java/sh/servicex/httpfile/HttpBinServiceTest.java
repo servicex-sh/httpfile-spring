@@ -10,14 +10,19 @@ import sh.servicex.httpfile.spring.HttpFileProxyFactory;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpBinServiceTest {
     private static HttpBinService httpBinService;
 
     @BeforeAll
     public static void setUp() {
-        HttpFileProxyFactory httpFileProxyFactory = new HttpFileProxyFactory(WebClientAdapter.forClient(WebClient.builder().build()));
-        httpBinService = httpFileProxyFactory.createClient(HttpBinService.class);
+        WebClient webClient = WebClient.builder().build();
+        Map<String, String> globalContext = new HashMap<>();
+        globalContext.put("host", "httpbin.org");
+        HttpFileProxyFactory httpFileProxyFactory = HttpFileProxyFactory.builder(WebClientAdapter.forClient(webClient)).build();
+        httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalContext);
     }
 
     @Test
