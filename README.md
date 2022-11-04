@@ -46,7 +46,8 @@ public interface HttpBinService {
 * Build proxy for HTTP request interface and execute request.
 
 ```
- HttpFileProxyFactory httpFileProxyFactory = new HttpFileProxyFactory(WebClientAdapter.forClient(WebClient.builder().build()));
+ WebClient webClient = WebClient.builder().build();
+ HttpFileProxyFactory httpFileProxyFactory = HttpFileProxyFactory.builder(WebClientAdapter.forClient(webClient)).build();
  httpBinService = httpFileProxyFactory.createClient(HttpBinService.class);
  String ip = httpBinService.myIp().origin();
 ```
@@ -84,6 +85,20 @@ public interface HttpBinService {
 
 * `$uuid`, `$timestamp` and `$randomInt`
 * `$random` object: `$random.integer`, `$random.float`, `$random.alphabetic`, `$random.alphanumeric`, `$random.hexadecimal` and `$random.email`
+ 
+# FAQ
+
+### Global context variables support
+
+Some variables, such as `host`, `token`,  shared by multi request, and these variables should be global.
+You can build HTTP service interface with global context as following:
+
+```
+Map<String, String> globalContext = new HashMap<>();
+globalContext.put("host", "httpbin.org");
+//...
+httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalContext);
+```
 
 # References
 
