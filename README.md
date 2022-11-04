@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 ```
 
-* Create Java interface and bind with http file.
+* Create Java interface and bind with http file: method param names should be same with variables in http file. 
 
 ```java
 import java.util.Map;
@@ -100,7 +100,7 @@ public interface HttpBinService {
 
 ### Global context variables support
 
-Some variables, such as `host`, `token`,  shared by multi request, and these variables should be global.
+Some variables, such as `host`, `token`,  shared by multi requests, and these variables could be global.
 You can build HTTP service interface with global context as following:
 
 ```
