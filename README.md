@@ -2,6 +2,11 @@ httpfile Spring
 ==================
 
 Use Java interface and http file to access remote HTTP/GraphQL services.
+                     
+# Why Java http interface bound with http file?
+
+* http file is easy to write and test
+* If you have http files already, why not reuse them?
 
 # How to get started?
 
