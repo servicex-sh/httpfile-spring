@@ -1,9 +1,9 @@
 ### get my ip
-//@name myIp
+#@name myIp
 GET https://httpbin.org/ip
 
 ### Post test
-//@name postTest
+#@name postTest
 < {%
     request.variables.set("nick", "linux_china");
 %}
@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### graphql test
-//@name graphqlTest
+#@name graphqlTest
 GRAPHQL https://graphqlzero.almansi.me/api
 
 query demo($id: ID!) {
