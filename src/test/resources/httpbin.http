@@ -1,13 +1,13 @@
 ### get my ip
 #@name myIp
-GET https://httpbin.org/ip
+GET http://{{host}}/ip
 
 ### Post test
 #@name postTest
 < {%
     request.variables.set("nick", "linux_china");
 %}
-POST https://httpbin.org/post
+POST https://{{host}}/post
 Content-Type: application/json
 
 {
