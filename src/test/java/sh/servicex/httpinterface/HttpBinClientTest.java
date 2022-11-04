@@ -9,7 +9,7 @@ public class HttpBinClientTest {
     @Test
     public void testClient() throws Exception {
         WebClient webClient = WebClient.builder().build();
-        HttpServiceProxyFactory httpServiceProxyFactory = new HttpServiceProxyFactory(WebClientAdapter.forClient(webClient));
+        final HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient)).build();
         httpServiceProxyFactory.afterPropertiesSet();
         HttpBinClient httpBinClient = httpServiceProxyFactory.createClient(HttpBinClient.class);
         System.out.println(httpBinClient.myIp().origin());
