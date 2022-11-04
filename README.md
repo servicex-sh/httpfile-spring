@@ -9,11 +9,11 @@ Use Java interface and http file to access remote HTTP/GraphQL services.
 
 ```
 ### get my ip
-//@name myIp
+#@name myIp
 GET https://httpbin.org/ip
 
 ### Post test
-//@name postTest
+#@name postTest
 POST https://httpbin.org/post
 Content-Type: application/json
 
@@ -57,7 +57,7 @@ You can call GraphQL over HTTP services in http file, and request as following:
 
 ```
 ### graphql test
-//@name graphqlTest
+#@name graphqlTest
 GRAPHQL https://localhost:8787/graphql
 
 query {
