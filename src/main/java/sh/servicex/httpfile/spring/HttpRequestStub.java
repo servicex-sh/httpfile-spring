@@ -69,7 +69,8 @@ public class HttpRequestStub {
         this.httpFileRequest = httpFileRequest;
         this.body = httpFileRequest.getBody();
         this.variablesInBody = httpFileRequest.isVariablesInBody();
-        this.httpMock = this.globalContext.containsKey("http.mock") || System.getProperties().contains("http.mock");
+        final String httpMockValue = this.globalContext.getOrDefault("http.mock", System.getProperties().getProperty("http.mock", "false"));
+        this.httpMock = httpMockValue.equalsIgnoreCase("true") || httpMockValue.equals("1");
     }
 
     public Method getMethod() {
