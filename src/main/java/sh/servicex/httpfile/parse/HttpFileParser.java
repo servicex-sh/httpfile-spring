@@ -47,6 +47,8 @@ public class HttpFileParser {
                             String[] parts = tag.split("[=\\s]+", 2);
                             if (parts[0].equals("name") && parts.length > 1) {
                                 httpRequest.setName(parts[1].trim());
+                            } else if (parts[0].equals("mock") && parts.length > 1) {
+                                httpRequest.setMockResult(parts[1].trim());
                             }
                             httpRequest.addTag(tag);
                         }
