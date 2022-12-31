@@ -1,5 +1,6 @@
 ### get my ip
 #@name myIp
+#@mock {"origin":"127.0.0.1"}
 GET http://{{host}}/ip
 
 ### Post test
