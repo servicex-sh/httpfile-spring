@@ -24,6 +24,7 @@ public class HttpFileRequest {
     private String body;
     private boolean variablesInBody = false;
     private String jsTestCode;
+    private String mockResult;
     private String redirectResponse;
     private HttpRequestTarget requestTarget;
     private List<String> preScriptLines;
@@ -95,6 +96,14 @@ public class HttpFileRequest {
 
     public String getRequestLine() {
         return requestLine;
+    }
+
+    public String getMockResult() {
+        return mockResult;
+    }
+
+    public void setMockResult(String mockResult) {
+        this.mockResult = mockResult;
     }
 
     public void setRequestLine(String requestLine) {
