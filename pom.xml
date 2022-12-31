@@ -6,7 +6,7 @@
 
     <groupId>org.mvnsearch</groupId>
     <artifactId>httpfile-spring</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>httpfile-spring</name>
     <description>HTTP request support by interface and http file</description>
@@ -17,7 +17,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring.version>6.0.0</spring.version>
+        <spring.version>6.0.3</spring.version>
     </properties>
 
     <developers>
