@@ -43,6 +43,7 @@ public class HttpRequestStub {
     private final HttpFileRequest httpFileRequest;
     private final ResponseFunction responseFunction;
     private final ResponseFunction mockedResponseFunction;
+    private final boolean httpMock;
 
 
     public HttpRequestStub(Map<String, String> globalContext, Method method, Class<?> containingClass, HttpClientAdapter clientAdapter,
@@ -68,6 +69,7 @@ public class HttpRequestStub {
         this.httpFileRequest = httpFileRequest;
         this.body = httpFileRequest.getBody();
         this.variablesInBody = httpFileRequest.isVariablesInBody();
+        this.httpMock = this.globalContext.containsKey("http.mock") || System.getProperties().contains("http.mock");
     }
 
     public Method getMethod() {
@@ -80,7 +82,7 @@ public class HttpRequestStub {
         if (!globalContext.isEmpty()) {
             properties.putAll(globalContext);
         }
-        boolean isMocked = globalContext.containsKey("_mock") && httpFileRequest.getMockResult() != null;
+        boolean isMocked = httpMock && httpFileRequest.getMockResult() != null;
         final Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             String name = parameters[i].getName();
