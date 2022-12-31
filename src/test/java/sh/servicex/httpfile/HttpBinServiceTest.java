@@ -21,7 +21,7 @@ public class HttpBinServiceTest {
         WebClient webClient = WebClient.builder().build();
         Map<String, String> globalContext = new HashMap<>();
         globalContext.put("host", "httpbin.org");
-        //globalContext.put("_mock", "true");
+        //globalContext.put("http.mock", "true");
         HttpFileProxyFactory httpFileProxyFactory = HttpFileProxyFactory.builder(WebClientAdapter.forClient(webClient)).build();
         httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalContext);
     }
