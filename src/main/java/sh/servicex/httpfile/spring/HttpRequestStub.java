@@ -32,7 +32,7 @@ public class HttpRequestStub {
     private final Method method;
     private final Class<?> containingClass;
     private final HttpClientAdapter clientAdapter;
-    private HttpMethod httpMethod;
+    private final HttpMethod httpMethod;
     @Nullable
     private URI uri;
     @Nullable
@@ -42,6 +42,7 @@ public class HttpRequestStub {
     private final boolean variablesInBody;
     private final HttpFileRequest httpFileRequest;
     private final ResponseFunction responseFunction;
+    private final ResponseFunction mockedResponseFunction;
 
 
     public HttpRequestStub(Map<String, String> globalContext, Method method, Class<?> containingClass, HttpClientAdapter clientAdapter,
@@ -52,6 +53,7 @@ public class HttpRequestStub {
         this.method = method;
         this.clientAdapter = clientAdapter;
         this.responseFunction = ResponseFunction.create(clientAdapter, method, reactiveRegistry, blockTimeout);
+        this.mockedResponseFunction = ResponseFunction.create(new HttpClientAdapterMock(), method, reactiveRegistry, blockTimeout);
         String uriText = httpFileRequest.getRequestTarget().toUriText();
         if (uriText.contains("{{")) {
             this.uriTemplate = uriText.replaceAll("\\{\\{", "{").replaceAll("}}", "}");
@@ -78,6 +80,7 @@ public class HttpRequestStub {
         if (!globalContext.isEmpty()) {
             properties.putAll(globalContext);
         }
+        boolean isMocked = globalContext.containsKey("_mock") && httpFileRequest.getMockResult() != null;
         final Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             String name = parameters[i].getName();
@@ -86,6 +89,9 @@ public class HttpRequestStub {
         }
         RequestContextVariableValueResolver variableValueResolver = new RequestContextVariableValueResolver(properties);
         final HttpRequestValues.Builder requestValues = HttpRequestValues.builder();
+        if (isMocked) {
+            requestValues.addAttribute("mockResult", httpFileRequest.getMockResult());
+        }
         //set request method
         requestValues.setHttpMethod(this.httpMethod);
         //set request uri
@@ -108,7 +114,11 @@ public class HttpRequestStub {
                 requestValues.setBodyValue(this.body);
             }
         }
-        return this.responseFunction.execute(requestValues.build());
+        if (isMocked) {
+            return this.mockedResponseFunction.execute(requestValues.build());
+        } else {
+            return this.responseFunction.execute(requestValues.build());
+        }
     }
 
     public void fillHeaders(HttpRequestValues.Builder requestValues, RequestContextVariableValueResolver variableValueResolver) {
