@@ -155,5 +155,6 @@ globalContext.put("http.mock", httpMock);
 
 # References
 
-* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0-RC3/reference/html/integration.html#rest-http-interface
+* Spring 6.0 HTTP Interface: https://docs.spring.io/spring-framework/docs/6.0.0/reference/html/integration.html#rest-http-interface
+* JetBrains HTTP Client: https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
   
