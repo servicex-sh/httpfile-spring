@@ -2,7 +2,7 @@ httpfile Spring
 ==================
 
 Use Java interface and http file to access remote HTTP/GraphQL services.
-                     
+
 # Why Java http interface bound with http file?
 
 * http file is easy to write and test
@@ -13,10 +13,11 @@ Use Java interface and http file to access remote HTTP/GraphQL services.
 * Add `httpfile-spring` dependency in pom.xml
 
 ```xml
+
 <dependency>
     <groupId>org.mvnsearch</groupId>
     <artifactId>httpfile-spring</artifactId>
-    <version>1.0.0-RC3</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -37,7 +38,7 @@ Content-Type: application/json
 }
 ```
 
-* Create Java interface and bind with http file: method param names should be same with variables in http file. 
+* Create Java interface and bind with http file: method param names should be same with variables in http file.
 
 ```java
 import java.util.Map;
@@ -100,12 +101,12 @@ public interface HttpBinService {
 
 * `$uuid`, `$timestamp` and `$randomInt`
 * `$random` object: `$random.integer`, `$random.float`, `$random.alphabetic`, `$random.alphanumeric`, `$random.hexadecimal` and `$random.email`
- 
+
 # FAQ
 
 ### Global context variables support
 
-Some variables, such as `host`, `token`,  shared by multi requests, and these variables could be global.
+Some variables, such as `host`, `token`, shared by multi requests, and these variables could be global.
 You can build HTTP service interface with global context as following:
 
 ```
@@ -113,6 +114,43 @@ Map<String, String> globalContext = new HashMap<>();
 globalContext.put("host", "httpbin.org");
 //...
 httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalContext);
+```
+
+### How to mock http request?
+
+You can mock http request by using `#@mock` tag in http file, such as:
+
+```
+### get my ip
+#@name myIp
+#@mock {"origin":"127.0.0.1"}
+GET https://{{host}}/ip
+```
+
+**Attention**: mock feature is disabled by default, and you should enable with following code:
+
+```
+Map<String, String> globalContext = new HashMap<>();
+globalContext.put("http.mock", "true");
+//
+//...
+httpBinService = httpFileProxyFactory.createClient(HttpBinService.class, globalContext);
+```
+
+或者通过System Properties进行设置，这样就可以通过命令行参数进行设置。
+
+```
+System.getProperties().put("http.mock","true");
+```
+
+如果使用Spring Boot的话，你可以通过properties key进行设置，如下:
+
+```
+@Value("${http.mock:false}")
+private String httpMock;
+
+Map<String, String> globalContext = new HashMap<>();
+globalContext.put("http.mock", httpMock);
 ```
 
 # References
